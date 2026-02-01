@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage; 
 
 class ProfileController extends Controller
 {
@@ -24,18 +25,45 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
+
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // 1) Données validées (texte)
+        $validated = $request->validated();
+
+        // 2) IMPORTANT : on retire "avatar" du fill (car c'est un fichier)
+        if(array_key_exists('avatar', $validated)) unset($validated['avatar']);
+
+        // 3) Update des champs texte (name, email, bio, username...)
+        $user->fill($validated);
+
+        // Si email a changé => on annule la vérification
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        // 4) Si l'utilisateur a envoyé une image
+        if ($request->hasFile('avatar')) {
+
+            // supprimer l'ancienne image
+            if ($user->avatar_path) {
+                Storage::disk('public')->delete($user->avatar_path);
+            }
+
+            // upload dans storage/app/public/avatars
+            $path = $request->file('avatar')->store('avatars', 'public');
+
+            // on stocke le chemin dans la DB
+            $user->avatar_path = $path;
+        }
+       
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
+
 
     /**
      * Delete the user's account.

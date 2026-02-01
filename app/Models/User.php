@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\FriendRequest;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,8 @@ class User extends Authenticatable
         'name',
         'username',
         'email',
+        'bio',
+        'path',
         'password',
     ];
 
@@ -46,4 +49,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function sentRequests()
+    {
+        return $this->hasMany(FriendRequest::class, 'sender_id');
+    }
+    
+    public function receivedRequests()
+    {
+        return $this->hasMany(FriendRequest::class, 'receiver_id');
+    }
+
 }

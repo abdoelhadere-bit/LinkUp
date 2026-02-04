@@ -6,7 +6,7 @@
             <p class="text-sm text-gray-500">Fil d’actualité</p>
         </div>
 
-        {{-- SEARCH (Facebook style) --}}
+        {{-- SEARCH --}}
         <div class="relative w-full max-w-md">
             <form method="GET" action="{{ route('dashboard') }}" class="flex items-center gap-2">
                 <input
@@ -15,7 +15,6 @@
                     value="{{ $q }}"
                     class="w-full border-gray-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-gray-900/10 focus:border-gray-300"
                     placeholder="Rechercher (username, email, nom)..."
-                    autocomplete="off"
                 >
                 <button class="px-4 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800">
                     Search
@@ -68,31 +67,27 @@
 
                 </aside>
 
-                {{-- FEED --}}
+               {{-- FEED --}}
                 <main class="col-span-12 lg:col-span-8 space-y-6">
-
-                    {{-- Composer (placeholder pour plus tard) --}}
+                    <!-- create post -->
+                    {{-- Composer --}}
                     <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5">
                         <div class="flex items-start gap-3">
                             <div class="h-11 w-11 rounded-full bg-slate-200"></div>
+
                             <div class="flex-1">
-                                <div class="rounded-2xl border border-slate-200 px-4 py-3 text-slate-400">
-                                    (Bientôt) Écrire un post…
-                                </div>
-                                <div class="mt-3 flex justify-end">
-                                    <button disabled class="rounded-xl bg-slate-200 px-4 py-2 text-sm font-medium text-slate-500 cursor-not-allowed">
-                                        Publier
-                                    </button>
-                                </div>
+
+                                <livewire:create-post />
+
                             </div>
                         </div>
                     </div>
-
-                    {{-- Feed items (placeholder) --}}
+                    <!-- fil d'actualite -->
                     <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 p-5">
                         <h3 class="font-semibold text-slate-900 mb-2">Fil d’actualité</h3>
-                        <p class="text-sm text-slate-500">
-                        </p>
+
+                        <livewire:feed />
+
                     </div>
 
                 </main>

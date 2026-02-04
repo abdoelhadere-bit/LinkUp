@@ -17,16 +17,11 @@ Route::middleware('auth')->group(function () {
 });
 
 
-Route::middleware('auth')->group(function () {
-    Route::get('/friends', [FriendRequestController::class, 'index'])->name('friends.index');
+Route::middleware(['auth', 'verified'])->get('/friends', function () {
+    return view('friends');
+})->name('friends.index');
 
-    Route::post('/friend-requests', [FriendRequestController::class, 'send'])->name('friend-requests.send');
+Route::middlewqre(['auth', 'verified'])->get()
 
-    Route::patch('/friend-requests/{friendRequest}/accept', [FriendRequestController::class, 'accept'])
-        ->name('friend-requests.accept');
-
-    Route::patch('/friend-requests/{friendRequest}/decline', [FriendRequestController::class, 'decline'])
-        ->name('friend-requests.decline');
-});
 
 require __DIR__.'/auth.php';

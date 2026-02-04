@@ -23,7 +23,7 @@ class User extends Authenticatable
         'username',
         'email',
         'bio',
-        'path',
+        'avatar_path',
         'password',
     ];
 
@@ -58,6 +58,21 @@ class User extends Authenticatable
     public function receivedRequests()
     {
         return $this->hasMany(FriendRequest::class, 'receiver_id');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    } 
+
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
 }

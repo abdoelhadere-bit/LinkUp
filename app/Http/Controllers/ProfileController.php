@@ -30,13 +30,11 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        // 1) Données validées (texte)
+        // 1) Données validées 
         $validated = $request->validated();
 
-        // 2) IMPORTANT : on retire "avatar" du fill (car c'est un fichier)
         if(array_key_exists('avatar', $validated)) unset($validated['avatar']);
 
-        // 3) Update des champs texte (name, email, bio, username...)
         $user->fill($validated);
 
         // Si email a changé => on annule la vérification

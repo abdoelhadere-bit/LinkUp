@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Post;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -82,5 +84,16 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function show(string $username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        $posts = Post::where('user_id', $user->id)
+                ->with(['likes', 'user', 'comments.user'])
+                ->latest()->paginate(10);
+
+        return view('users.show', compact('user', 'posts'));
     }
 }

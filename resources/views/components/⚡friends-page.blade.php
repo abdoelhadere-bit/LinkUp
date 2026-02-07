@@ -3,6 +3,7 @@
 use Livewire\Component;
 use App\Models\User;
 use App\Models\FriendRequest;
+use App\services\FriendService;
 
 new class extends Component
 {
@@ -21,52 +22,23 @@ new class extends Component
             })
             ->orderBy('username')
             ->limit(10)->get();
-        }
-
+    }
+    
     public function relationsStatus($userId):string
     {
         $me = Auth::id();
-        $state = FriendRequest::query()
-            ->where(function($q) use ($me, $userId){
-                $q->where('receiver_id', $me)->where('sender_id', $userId);
-            })
-            ->orWhere(function($q) use ($me, $userId){
-                 $q->where('receiver_id', $userId)->where('sender_id', $me);
-            })
-            ->first();
-        if(!$state) return 'none';
-        if($state->status == 'accepted') return 'friends';
-        if($state->status == 'pending') return $state->sender_id == $me ? 'outgoing_pending': 'incoming_pending' ;
-        return 'none'; 
+        return app(FriendService::class)->status($userId, auth()->id()) ;
+ 
 
     }
 
     public function sendRequest($userId)
-        {
-            $me = Auth::id();
+    {
+        $me = Auth::id();
+        return app(FriendService::class)->send($userId, auth()->id()) ;
+    }
 
-            if($me == $userId) return;
-            
-            $isExist = FriendRequest::query()
-                ->where(function ($q) use ($me, $userId){
-                    $q->where('receiver_id', $me)->where('sender_id', $userId);
-                })
-                ->orWhere(function ($q) use ($me, $userId){
-                    $q->where('receiver_id', $userId)->where('sender_id', $me);
-                })
-                ->whereIn('status', ['pending', 'accepted'])
-                ->exists();
-            if($isExist) return;
-
-            FriendRequest::Create([
-                'receiver_id' => $userId,
-                'sender_id' => $me,
-                'status' => 'pending',
-            ]);
-            $this->dispatch('$refresh');
-        }
-
-        public function incomingRequests()
+    public function incomingRequests()
         {
             return FriendRequest::query()
                     ->where('receiver_id', auth()->id())
@@ -74,7 +46,7 @@ new class extends Component
                     ->latest()->get();
         }
 
-        public function outgoingRequests()
+    public function outgoingRequests()
         {
             return FriendRequest::query()
                     ->where('sender_id', auth()->id())
@@ -82,7 +54,7 @@ new class extends Component
                     ->latest()->get();
         }
 
-        public function friendsList()
+    public function friendsList()
         {
             $me = auth()->id();
 
@@ -102,27 +74,16 @@ new class extends Component
         }
 
 
-        public function acceptRequest ($id)
+    public function acceptRequest($userId)
         {
             $me = auth()->id();
-            $fr = FriendRequest::query()
-                    ->where('id', $id)
-                    ->where('receiver_id', $me)
-                    ->where('status', 'pending')
-                    ->firstOrFail();
-            $fr->update(['status'=>'accepted']);
-            $this->dispatch('$refresh');
+            return app(FriendService::class)->accept($userId, auth()->id()) ;
         }
 
-        public function declineRequest ($id)
+    public function declineRequest($userId)
         {
             $me = auth()->id();
-            $fr = FriendRequest::query()
-                    ->where('id', $id)
-                    ->where('receiver_id', $me)
-                    ->where('status', 'pending')
-                    ->firstOrFail();
-            $fr->update(['status'=>'declined']);
+            return app(FriendService::class)->decline($userId, auth()->id()) ;
         }
     }
 ?>

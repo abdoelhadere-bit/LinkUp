@@ -27,23 +27,6 @@ class FriendRequestController extends Controller
                 ->limit(20)->get();
         }
 
-
-
-
-
-        if ($q) {
-            // PostgreSQL => ILIKE (recherche insensible à la casse)
-            $users = User::query()
-                ->where('id', '!=', Auth::id())
-                ->where(function ($query) use ($q) {
-                    $query->where('username', 'ilike', "%{$q}%")
-                          ->orWhere('email', 'ilike', "%{$q}%")
-                          ->orWhere('name', 'ilike', "%{$q}%");
-                })
-                ->limit(20)
-                ->get();
-        }
-
         $receivedPending = Auth::user()
             ->receivedRequests()
             ->where('status', 'pending')

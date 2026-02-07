@@ -21,7 +21,6 @@ Route::middleware(['auth', 'verified'])->get('/friends', function () {
     return view('friends');
 })->name('friends.index');
 
-Route::middlewqre(['auth', 'verified'])->get()
-
+Route::middleware(['auth'])->get('/users/{username}', [ProfileController::class, 'show'])->name('users,show');
 
 require __DIR__.'/auth.php';
